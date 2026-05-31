@@ -1,0 +1,105 @@
+%% Chatbot Subsystem — Layered Architecture Diagram
+%% Drug Response Prediction & Recommendation Platform
+%% Graduation Project in Bioinformatics
+
+graph TB
+    %% ===== LAYER 1: PRESENTATION =====
+    subgraph PRESENTATION ["PRESENTATION LAYER"]
+        direction TB
+        User["👤 User<br/>Types natural-language questions<br/>Provides prediction/recommendation context"]
+        ChatUI["💬 Chat Widget UI<br/>web/js/app.js<br/>Sends HTTP POST /chat<br/>Displays AI responses"]
+    end
+
+    %% ===== LAYER 2: API GATEWAY =====
+    subgraph API_GATEWAY ["API GATEWAY LAYER — FastAPI"]
+        direction TB
+        FastAPI["⚡ FastAPI Backend<br/>api/main.py<br/>CORS · Middleware · Lifespan"]
+        Router["🔀 Chatbot Router<br/>api/routers/chatbot.py<br/>POST /chat<br/>GET /chat/history<br/>DELETE /chat/history<br/>GET /chat/status"]
+        Schemas["📋 Pydantic Schemas<br/>api/schemas/chatbot.py<br/>ChatRequest · ChatResponse<br/>ChatHistoryResponse<br/>ChatbotStatusResponse"]
+    end
+
+    %% ===== LAYER 3: BUSINESS LOGIC =====
+    subgraph BUSINESS_LOGIC ["BUSINESS LOGIC LAYER"]
+        direction TB
+        Service["🧠 Chatbot Service<br/>api/services/chatbot_service.py<br/>Singleton Pattern<br/>Orchestrates entire chat flow"]
+        PromptLoader["📄 System Prompt Loader<br/>chatbot_module/prompts/system_prompt.txt<br/>Domain Persona · Capabilities<br/>Project Architecture Knowledge<br/>Safety Restrictions · Response Format"]
+        ContextInjector["💉 Context Injector<br/>Prepends prediction/recommendation<br/>results into user message<br/>[Context: predicted_ic50: -1.46, …]"]
+        FallbackEngine["🛡️ Fallback Response Engine<br/>chatbot_module/backend/chatbot_utils.py<br/>FALLBACK_RESPONSES Dict<br/>match_fallback_topic()<br/>ic50 · recommendation · preprocessing · models · general"]
+        ModelFallback["🔄 Model Fallback Chain<br/>gemini-2.5-flash →<br/>gemini-2.0-flash-lite →<br/>gemini-2.0-flash<br/>On HTTP 429 Quota Errors"]
+    end
+
+    %% ===== LAYER 4: AI MODEL =====
+    subgraph AI_MODEL ["AI MODEL LAYER"]
+        direction TB
+        GeminiAPI["🔮 Gemini API Integration<br/>google-generativeai SDK<br/>genai.configure(api_key)<br/>HTTPS to Generative AI Service"]
+        GeminiModel["⚡ Gemini Model<br/>GenerativeModel<br/>system_instruction = System Prompt<br/>start_chat(history) · send_message(msg)"]
+    end
+
+    %% ===== LAYER 5: DATA & CONFIG =====
+    subgraph DATA_CONFIG ["DATA & CONFIGURATION LAYER"]
+        direction TB
+        ConvMemory["💾 Conversation Memory<br/>chatbot_module/backend/chatbot_memory.py<br/>In-Memory Dict · 50 msg/conversation cap<br/>add_message() · build_gemini_history()<br/>clear_conversation()"]
+        EnvConfig["⚙️ Environment Config<br/>.env File<br/>GEMINI_API_KEY<br/>GEMINI_MODEL"]
+        SystemPrompt["📝 System Prompt Data<br/>Domain Persona + Project Knowledge<br/>Safety Rules + Response Format<br/>Preprocessing Pipeline Details<br/>IC50 Thresholds · Model List"]
+        FallbackData["📦 Fallback Response Data<br/>ic50 · recommendation<br/>preprocessing · models · general<br/>Each includes ⚠️ disclaimer"]
+    end
+
+    %% ===== COMMUNICATION PATHS — PRIMARY FLOW =====
+    User -->|"Types question + optional context"| ChatUI
+    ChatUI -->|"HTTP POST /chat<br/>ChatRequest JSON"| Router
+    Router -->|"Validate request"| Schemas
+    Schemas -->|"Validated ChatRequest"| Router
+    Router -->|"chat(message, conversation_id, context)"| Service
+
+    %% — Context Injection Path
+    Service -->|"If context provided"| ContextInjector
+    ContextInjector -->|"Enhanced message<br/>[Context: …]<br/>User question: …"| Service
+
+    %% — System Prompt Path
+    Service -->|"Load domain prompt"| PromptLoader
+    PromptLoader -->|"System prompt string"| Service
+
+    %% — Gemini Primary Path
+    Service -->|"is_available() = True"| GeminiAPI
+    GeminiAPI -->|"Configure + Create Model"| GeminiModel
+    GeminiModel -->|"AI Response Text"| Service
+
+    %% — Model Fallback Path
+    Service -->|"429 Quota Error"| ModelFallback
+    ModelFallback -->|"Try next model"| GeminiAPI
+
+    %% — Fallback Path
+    Service -->|"is_available() = False<br/>OR all models fail"| FallbackEngine
+    FallbackEngine -->|"match_fallback_topic()"| FallbackData
+    FallbackData -->|"Pre-defined Response"| Service
+
+    %% — Memory Path
+    Service -->|"add_message(conv_id, role, content)"| ConvMemory
+    Service -->|"build_gemini_history(conv_id)"| ConvMemory
+    ConvMemory -->|"Gemini-formatted history<br/>[{role, parts}]"| Service
+
+    %% — Config Path
+    EnvConfig -->|"GEMINI_API_KEY · GEMINI_MODEL"| GeminiAPI
+    SystemPrompt -->|"Domain Persona + Safety"| GeminiModel
+
+    %% — Response Path
+    Service -->|"ChatResponse Dict"| Router
+    Router -->|"HTTP 200 ChatResponse JSON"| ChatUI
+    ChatUI -->|"Display AI Response"| User
+
+    %% ===== STYLING =====
+    classDef user fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#000
+    classDef frontend fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000
+    classDef gateway fill:#FFF3E0,stroke:#E65100,stroke-width:2px,color:#000
+    classDef service fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px,color:#000
+    classDef ai fill:#E8EAF6,stroke:#283593,stroke-width:2px,color:#000
+    classDef data fill:#E0F2F1,stroke:#00695C,stroke-width:2px,color:#000
+    classDef fallback fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#000
+
+    class User user
+    class ChatUI frontend
+    class FastAPI,Router,Schemas gateway
+    class Service,PromptLoader,ContextInjector service
+    class FallbackEngine,ModelFallback fallback
+    class GeminiAPI,GeminiModel ai
+    class ConvMemory,EnvConfig,SystemPrompt,FallbackData data

@@ -1,0 +1,207 @@
+<mxfile host="app.diagrams.net" modified="2026-05-30" agent="5.0" version="24.0" type="device">
+  <diagram id="arch-diagram" name="High-Level Architecture Diagram">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- LAYER 1: PRESENTATION LAYER -->
+        <mxCell id="L1" value="PRESENTATION LAYER" style="swimlane;startSize=30;fillColor=#E8F5E9;strokeColor=#2E7D32;fontStyle=1;fontSize=14;fontColor=#2E7D32;horizontal=1;collapsible=0;rounded=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="1520" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="User" value="<b>User</b><br>Types natural-language<br>questions about drug<br>response predictions" style="shape=mxgraph.flowchart.annotation_2;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;fontColor=#333;rounded=1;arcSize=10;whiteSpace=wrap;" vertex="1" parent="L1">
+          <mxGeometry x="30" y="40" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ChatUI" value="<b>Chat Widget UI</b><br>web/js/app.js<br>HTTP POST /chat<br>Displays AI responses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L1">
+          <mxGeometry x="250" y="40" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- LAYER 2: API GATEWAY LAYER -->
+        <mxCell id="L2" value="API GATEWAY LAYER — FastAPI" style="swimlane;startSize=30;fillColor=#FFF3E0;strokeColor=#E65100;fontStyle=1;fontSize=14;fontColor=#E65100;horizontal=1;collapsible=0;rounded=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="1520" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="FastAPI" value="<b>FastAPI Backend</b><br>api/main.py<br>CORS · Middleware · Lifespan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L2">
+          <mxGeometry x="30" y="40" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="Router" value="<b>Chatbot Router</b><br>api/routers/chatbot.py<br>POST /chat · GET /chat/history<br>DELETE /chat/history · GET /chat/status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L2">
+          <mxGeometry x="250" y="40" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="Schemas" value="<b>Pydantic Schemas</b><br>api/schemas/chatbot.py<br>ChatRequest · ChatResponse<br>ChatHistoryResponse<br>ChatbotStatusResponse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L2">
+          <mxGeometry x="510" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- LAYER 3: BUSINESS LOGIC LAYER -->
+        <mxCell id="L3" value="BUSINESS LOGIC LAYER" style="swimlane;startSize=30;fillColor=#F3E5F5;strokeColor=#6A1B9A;fontStyle=1;fontSize=14;fontColor=#6A1B9A;horizontal=1;collapsible=0;rounded=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="1520" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="Service" value="<b>Chatbot Service</b><br>api/services/chatbot_service.py<br>Singleton Pattern<br>Orchestrates entire chat flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L3">
+          <mxGeometry x="30" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="PromptLoader" value="<b>System Prompt Loader</b><br>chatbot_module/prompts/<br>system_prompt.txt<br>Domain persona · Safety rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L3">
+          <mxGeometry x="260" y="40" width="180" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ContextInjector" value="<b>Context Injector</b><br>Prepends prediction/recommendation<br>results into user message<br>[Context: ic50: -1.46, ...]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L3">
+          <mxGeometry x="470" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="FallbackEngine" value="<b>Fallback Response Engine</b><br>chatbot_module/backend/chatbot_utils.py<br>FALLBACK_RESPONSES Dict<br>match_fallback_topic()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L3">
+          <mxGeometry x="700" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ModelFallback" value="<b>Model Fallback Chain</b><br>gemini-2.5-flash →<br>gemini-2.0-flash-lite →<br>gemini-2.0-flash<br>On HTTP 429 Quota Errors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L3">
+          <mxGeometry x="930" y="40" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- LAYER 4: AI MODEL LAYER -->
+        <mxCell id="L4" value="AI MODEL LAYER" style="swimlane;startSize=30;fillColor=#E8EAF6;strokeColor=#283593;fontStyle=1;fontSize=14;fontColor=#283593;horizontal=1;collapsible=0;rounded=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="1520" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="GeminiAPI" value="<b>Gemini API Integration</b><br>google-generativeai SDK<br>genai.configure(api_key)<br>HTTPS to Generative AI Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#283593;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L4">
+          <mxGeometry x="30" y="40" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="GeminiModel" value="<b>Gemini Model</b><br>GenerativeModel<br>system_instruction = System Prompt<br>start_chat(history) · send_message(msg)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#283593;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L4">
+          <mxGeometry x="260" y="40" width="220" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- LAYER 5: DATA & CONFIG LAYER -->
+        <mxCell id="L5" value="DATA & CONFIGURATION LAYER" style="swimlane;startSize=30;fillColor=#E0F2F1;strokeColor=#00695C;fontStyle=1;fontSize=14;fontColor=#00695C;horizontal=1;collapsible=0;rounded=1;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="1520" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="ConvMemory" value="<b>Conversation Memory</b><br>chatbot_module/backend/chatbot_memory.py<br>In-Memory Dict<br>50 msg/conversation cap<br>add_message() · build_gemini_history()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L5">
+          <mxGeometry x="30" y="40" width="220" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="EnvConfig" value="<b>Environment Config</b><br>.env File<br>GEMINI_API_KEY<br>GEMINI_MODEL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L5">
+          <mxGeometry x="280" y="40" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="SystemPrompt" value="<b>System Prompt Data</b><br>Domain Persona<br>Project Knowledge<br>Safety Rules<br>Response Format" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L5">
+          <mxGeometry x="470" y="40" width="160" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="FallbackData" value="<b>Fallback Response Data</b><br>ic50 · recommendation<br>preprocessing · models<br>general<br>Each includes disclaimer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00695C;fontSize=11;fontColor=#333;arcSize=10;shadow=1;" vertex="1" parent="L5">
+          <mxGeometry x="660" y="40" width="160" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ===== COMMUNICATION ARROWS ===== -->
+
+        <!-- Primary Request Flow -->
+        <mxCell id="E1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;labelBackgroundColor=#E8F5E9;fontSize=10;" edge="1" source="User" target="ChatUI" parent="L1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E1_label" value="Types question +<br>optional context" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#2E7D32;" vertex="1" connectable="0" parent="E1">
+          <mxGeometry x="-0.2" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;labelBackgroundColor=#E8F5E9;fontSize=10;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ChatUI" target="Router" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E2_label" value="HTTP POST /chat<br>ChatRequest JSON" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#2E7D32;" vertex="1" connectable="0" parent="E2">
+          <mxGeometry x="-0.1" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E65100;fontColor=#E65100;labelBackgroundColor=#FFF3E0;fontSize=10;" edge="1" source="Router" target="Schemas" parent="L2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E3_label" value="Validate request" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#E65100;" vertex="1" connectable="0" parent="E3">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6A1B9A;fontColor=#6A1B9A;labelBackgroundColor=#F3E5F5;fontSize=10;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="Router" target="Service" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E4_label" value="chat(message,<br>conversation_id, context)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#6A1B9A;" vertex="1" connectable="0" parent="E4">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Context Injection -->
+        <mxCell id="E5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6A1B9A;fontColor=#6A1B9A;labelBackgroundColor=#F3E5F5;fontSize=10;dashed=1;dashPattern=8 4;" edge="1" source="Service" target="ContextInjector" parent="L3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E5_label" value="If context provided" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#6A1B9A;" vertex="1" connectable="0" parent="E5">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- System Prompt -->
+        <mxCell id="E6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6A1B9A;fontColor=#6A1B9A;labelBackgroundColor=#F3E5F5;fontSize=10;" edge="1" source="Service" target="PromptLoader" parent="L3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E6_label" value="Load domain prompt" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#6A1B9A;" vertex="1" connectable="0" parent="E6">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Gemini Primary Path -->
+        <mxCell id="E7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#283593;fontColor=#283593;labelBackgroundColor=#E8EAF6;fontSize=10;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="Service" target="GeminiAPI" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E7_label" value="is_available() = True" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#283593;" vertex="1" connectable="0" parent="E7">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E8" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#283593;fontColor=#283593;labelBackgroundColor=#E8EAF6;fontSize=10;" edge="1" source="GeminiAPI" target="GeminiModel" parent="L4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E8_label" value="Configure + Create Model" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#283593;" vertex="1" connectable="0" parent="E8">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Model Fallback -->
+        <mxCell id="E9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C62828;fontColor=#C62828;labelBackgroundColor=#FFEBEE;fontSize=10;dashed=1;dashPattern=8 4;" edge="1" source="Service" target="ModelFallback" parent="L3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E9_label" value="429 Quota Error" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#C62828;" vertex="1" connectable="0" parent="E9">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Fallback Path -->
+        <mxCell id="E10" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C62828;fontColor=#C62828;labelBackgroundColor=#FFEBEE;fontSize=10;dashed=1;dashPattern=8 4;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="Service" target="FallbackEngine" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E10_label" value="is_available() = False<br>OR all models fail" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#C62828;" vertex="1" connectable="0" parent="E10">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Memory Path -->
+        <mxCell id="E11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00695C;fontColor=#00695C;labelBackgroundColor=#E0F2F1;fontSize=10;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="Service" target="ConvMemory" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E11_label" value="add_message(conv_id, role, content)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#00695C;" vertex="1" connectable="0" parent="E11">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Config Paths -->
+        <mxCell id="E12" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00695C;fontColor=#00695C;labelBackgroundColor=#E0F2F1;fontSize=10;" edge="1" source="EnvConfig" target="GeminiAPI" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E12_label" value="GEMINI_API_KEY<br>GEMINI_MODEL" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#00695C;" vertex="1" connectable="0" parent="E12">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E13" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00695C;fontColor=#00695C;labelBackgroundColor=#E0F2F1;fontSize=10;" edge="1" source="SystemPrompt" target="GeminiModel" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E13_label" value="Domain Persona + Safety" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#00695C;" vertex="1" connectable="0" parent="E13">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- Response Path -->
+        <mxCell id="E14" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E65100;fontColor=#E65100;labelBackgroundColor=#FFF3E0;fontSize=10;direction=south;" edge="1" source="Service" target="Router" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E14_label" value="ChatResponse Dict" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#E65100;" vertex="1" connectable="0" parent="E14">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E15" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;labelBackgroundColor=#E8F5E9;fontSize=10;direction=north;" edge="1" source="Router" target="ChatUI" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E15_label" value="HTTP 200 ChatResponse JSON" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#2E7D32;" vertex="1" connectable="0" parent="E15">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="E16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;fontColor=#2E7D32;labelBackgroundColor=#E8F5E9;fontSize=10;direction=north;" edge="1" source="ChatUI" target="User" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="E16_label" value="Display AI Response" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontColor=#2E7D32;" vertex="1" connectable="0" parent="E16">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

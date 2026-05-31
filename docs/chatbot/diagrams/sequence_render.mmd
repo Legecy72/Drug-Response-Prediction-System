@@ -1,0 +1,58 @@
+sequenceDiagram
+    actor User
+    participant UI as Chat Widget UI
+    participant Router as Chatbot Router
+    participant Schemas as Pydantic Schemas
+    participant Service as Chatbot Service
+    participant Memory as Conversation Memory
+    participant Prompt as System Prompt
+    participant Gemini as Gemini API
+    participant Fallback as Fallback Engine
+
+    User->>UI: Type question + optional context
+    UI->>Router: HTTP POST /chat ChatRequest JSON
+    Router->>Schemas: Validate request schema
+    Schemas-->>Router: Validated ChatRequest
+    Router->>Service: chat message, conversation_id, context
+
+    Service->>Service: Generate or reuse conversation_id UUID
+
+    Service->>Service: If context provided build enhanced message
+
+    Service->>Service: is_available check GEMINI_API_KEY + model
+
+    alt Gemini API Available
+        Service->>Memory: build_gemini_history conversation_id
+        Memory-->>Service: Gemini-formatted history role, parts
+
+        Service->>Gemini: Configure API key Create GenerativeModel
+        Service->>Gemini: start_chat history send_message enhanced_message
+        Gemini-->>Service: AI Response Text
+
+        alt Quota Error 429
+            Service->>Service: Try fallback model gemini-2.0-flash-lite
+            Service->>Gemini: Create new GenerativeModel Retry send_message
+            Gemini-->>Service: Fallback Model Response
+            Service->>Service: Update active model name
+        else No Quota Error
+            Service->>Service: Use primary model response
+        end
+
+        Service->>Memory: add_message conv_id user original_message
+        Service->>Memory: add_message conv_id assistant ai_response
+
+        Service-->>Router: success True message ai_response conversation_id model_used
+
+    else Gemini API Unavailable
+        Service->>Fallback: match_fallback_topic message
+        Fallback->>Fallback: Scan keywords ic50 recommend preprocess model general
+        Fallback-->>Service: Pre-defined response with disclaimer
+
+        Service->>Memory: add_message conv_id user original_message
+        Service->>Memory: add_message conv_id assistant fallback_response
+
+        Service-->>Router: success True message fallback_response conversation_id model_used fallback
+    end
+
+    Router-->>UI: HTTP 200 ChatResponse JSON
+    UI-->>User: Display AI response in chat widget

@@ -1,0 +1,77 @@
+%% Chatbot Subsystem — Sequence Diagram
+%% Drug Response Prediction & Recommendation Platform
+%% Graduation Project in Bioinformatics
+
+sequenceDiagram
+    autonumber
+    actor User as 👤 User
+    participant UI as 💬 Chat Widget UI
+    participant Router as 🔀 Chatbot Router
+    participant Schemas as 📋 Pydantic Schemas
+    participant Service as 🧠 Chatbot Service
+    participant Memory as 💾 Conversation Memory
+    participant Prompt as 📄 System Prompt
+    participant Gemini as 🔮 Gemini API
+    participant Fallback as 🛡️ Fallback Engine
+
+    %% === REQUEST FLOW ===
+    User->>UI: Type question + optional context<br/>e.g., "What does IC50 = -1.46 mean?"<br/>context: {predicted_ic50: -1.46, drug_name: "Camptothecin"}
+    UI->>Router: HTTP POST /chat<br/>ChatRequest JSON<br/>{message, conversation_id, context}
+    Router->>Schemas: Validate request schema<br/>message: 1-2000 chars, non-empty
+    Schemas-->>Router: Validated ChatRequest
+
+    %% === SERVICE PROCESSING ===
+    Router->>Service: chat(message, conversation_id, context)
+    Service->>Service: Generate or reuse conversation_id (UUID)
+
+    %% === CONTEXT INJECTION ===
+    Service->>Service: If context provided:<br/>Build enhanced message<br/>"[Context: predicted_ic50: -1.46, ...]\n\nUser question: ..."
+
+    %% === AVAILABILITY CHECK ===
+    Service->>Service: is_available()<br/>Check GEMINI_API_KEY + model instance
+
+    %% === GEMINI PATH (Available) ===
+    alt Gemini API Available
+        %% === LOAD HISTORY ===
+        Service->>Memory: build_gemini_history(conversation_id)
+        Memory-->>Service: Gemini-formatted history<br/>[{role: "user"|"model", parts: [content]}]
+
+        %% === PRIMARY MODEL CALL ===
+        Service->>Gemini: Configure API key<br/>Create GenerativeModel<br/>model_name: "gemini-2.5-flash"<br/>system_instruction: System Prompt
+        Service->>Gemini: start_chat(history=chat_history)<br/>send_message(enhanced_message)
+        Gemini-->>Service: AI Response Text
+
+        %% === MODEL FALLBACK (On 429 Quota Error) ===
+        alt Quota Error 429
+            Service->>Service: Try fallback model<br/>"gemini-2.0-flash-lite"
+            Service->>Gemini: Create new GenerativeModel<br/>Retry send_message
+            Gemini-->>Service: Fallback Model Response
+            Service->>Service: Update active model name
+        else No Quota Error
+            Service->>Service: Use primary model response
+        end
+
+        %% === STORE IN MEMORY ===
+        Service->>Memory: add_message(conv_id, "user", original_message)
+        Service->>Memory: add_message(conv_id, "assistant", ai_response)
+
+        %% === RETURN SUCCESS ===
+        Service-->>Router: {success: True, message: ai_response,<br/>conversation_id: conv_id, model_used: "gemini-2.5-flash"}
+
+    %% === FALLBACK PATH (Unavailable) ===
+    else Gemini API Unavailable
+        Service->>Fallback: match_fallback_topic(message)
+        Fallback->>Fallback: Scan keywords:<br/>ic50 → "ic50"<br/>recommend → "recommendation"<br/>preprocess → "preprocessing"<br/>model → "models"<br/>default → "general"
+        Fallback-->>Service: Pre-defined response<br/>with ⚠️ disclaimer
+
+        %% === STORE IN MEMORY ===
+        Service->>Memory: add_message(conv_id, "user", original_message)
+        Service->>Memory: add_message(conv_id, "assistant", fallback_response)
+
+        %% === RETURN FALLBACK ===
+        Service-->>Router: {success: True, message: fallback_response,<br/>conversation_id: conv_id, model_used: "fallback"}
+    end
+
+    %% === RESPONSE FLOW ===
+    Router-->>UI: HTTP 200 ChatResponse JSON<br/>{success, message, conversation_id, model_used}
+    UI-->>User: Display AI response in chat widget

@@ -1,0 +1,92 @@
+graph LR
+    subgraph FRONTEND["FRONTEND - Web Application"]
+        ChatUI["Chat Widget UI\nweb/js/app.js\nChat Input - Response Display\nConversation ID Tracking"]
+        PredUI["Prediction Panel\nIC50 Result Display"]
+        RecUI["Recommendation Panel\nDrug Ranking Display"]
+    end
+
+    subgraph API["API GATEWAY - FastAPI"]
+        ChatRouter["Chatbot Router\napi/routers/chatbot.py\nPOST /chat\nGET /chat/history\nDELETE /chat/history\nGET /chat/status"]
+        ChatSchemas["Chat Schemas\napi/schemas/chatbot.py\nChatRequest - ChatResponse\nChatHistoryResponse\nChatbotStatusResponse"]
+        PredRouter["Prediction Router\napi/routers/predict.py\nPOST /predict/single"]
+        RecRouter["Recommendation Router\napi/routers/recommend.py\nPOST /recommend"]
+    end
+
+    subgraph SERVICES["SERVICE LAYER"]
+        ChatService["Chatbot Service\napi/services/chatbot_service.py\nSingleton Pattern\nchat - is_available\nget_status - get_conversation_history"]
+        PromptLoader["System Prompt Loader\nchatbot_module/prompts/\nsystem_prompt.txt\nchatbot_behavior.txt\nsafety_rules.txt"]
+        ContextInjector["Context Injector\nPrepends prediction/recommendation\nresults into user message"]
+        FallbackEngine["Fallback Response Engine\nchatbot_module/backend/chatbot_utils.py\nFALLBACK_RESPONSES Dict\nmatch_fallback_topic"]
+        ModelFallback["Model Fallback Chain\ngemini-2.5-flash\ngemini-2.0-flash-lite\ngemini-2.0-flash"]
+    end
+
+    subgraph MEMORY["MEMORY LAYER"]
+        ConvMemory["Conversation Memory\nchatbot_module/backend/chatbot_memory.py\nIn-Memory Dict\n50 msg/conversation cap\nadd_message - build_gemini_history"]
+    end
+
+    subgraph AI["AI INTEGRATION"]
+        GeminiSDK["Gemini SDK\ngoogle-generativeai\ngenai.configure api_key\nGenerativeModel\nstart_chat - send_message"]
+    end
+
+    subgraph CONFIG["CONFIGURATION"]
+        EnvFile[".env File\nGEMINI_API_KEY\nGEMINI_MODEL"]
+    end
+
+    User["User"]
+    GeminiCloud["Gemini Cloud API\nGoogle Generative AI\ngemini-2.5-flash\ngemini-2.0-flash-lite\ngemini-2.0-flash"]
+
+    User -->|"Ask Question + Optional Context"| ChatUI
+    ChatUI -->|"HTTP POST /chat\nChatRequest JSON"| ChatRouter
+    ChatRouter -->|"Validate Request"| ChatSchemas
+    ChatSchemas -->|"Validated ChatRequest"| ChatRouter
+    ChatRouter -->|"chat message conv_id context"| ChatService
+
+    ChatService -->|"If context provided"| ContextInjector
+    ContextInjector -->|"Enhanced Message\nContext: ...\nUser question: ..."| ChatService
+
+    ChatService -->|"Load domain prompt"| PromptLoader
+    PromptLoader -->|"System Prompt String"| ChatService
+
+    ChatService -->|"is_available = True"| GeminiSDK
+    GeminiSDK -->|"HTTPS API Call\ngenerativeai.googleapis.com"| GeminiCloud
+    GeminiCloud -->|"AI Response Text"| GeminiSDK
+    GeminiSDK -->|"Response Text"| ChatService
+
+    ChatService -->|"429 Quota Error"| ModelFallback
+    ModelFallback -->|"Try Next Model"| GeminiSDK
+
+    ChatService -->|"add_message conv_id role content"| ConvMemory
+    ConvMemory -->|"build_gemini_history conv_id\nrole parts"| ChatService
+
+    ChatService -->|"is_available = False\nOR all models fail"| FallbackEngine
+    FallbackEngine -->|"Match Topic + Return\nPre-defined Response\n+ Disclaimer"| ChatService
+
+    PredUI -->|"Prediction Result\nIC50 value model cell line"| ChatUI
+    RecUI -->|"Recommendation Result\nDrug ranking scores"| ChatUI
+    PredRouter -->|"Prediction Response"| PredUI
+    RecRouter -->|"Recommendation Response"| RecUI
+
+    EnvFile -->|"GEMINI_API_KEY\nGEMINI_MODEL"| GeminiSDK
+    EnvFile -->|"GEMINI_API_KEY"| ChatService
+
+    ChatService -->|"ChatResponse Dict"| ChatRouter
+    ChatRouter -->|"HTTP 200 JSON\nChatResponse"| ChatUI
+    ChatUI -->|"Display AI Response"| User
+
+    classDef external fill:#FFE0B2,stroke:#E65100,stroke-width:2px,color:#000
+    classDef frontend fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000
+    classDef api fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000
+    classDef service fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#000
+    classDef memory fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000
+    classDef ai fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#000
+    classDef config fill:#F5F5F5,stroke:#616161,stroke-width:2px,color:#000
+    classDef fallback fill:#FFF9C4,stroke:#F57F17,stroke-width:2px,color:#000
+
+    class User,GeminiCloud external
+    class ChatUI,PredUI,RecUI frontend
+    class ChatRouter,ChatSchemas,PredRouter,RecRouter api
+    class ChatService,PromptLoader,ContextInjector service
+    class FallbackEngine,ModelFallback fallback
+    class ConvMemory memory
+    class GeminiSDK ai
+    class EnvFile config

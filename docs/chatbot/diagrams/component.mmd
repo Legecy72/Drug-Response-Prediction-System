@@ -1,0 +1,114 @@
+%% Chatbot Subsystem — Component Diagram
+%% Drug Response Prediction & Recommendation Platform
+%% Graduation Project in Bioinformatics
+
+graph LR
+    %% ===== EXTERNAL ENTITIES =====
+    User["👤 User"]
+    GeminiCloud["🔮 Gemini Cloud API<br/>Google Generative AI<br/>gemini-2.5-flash<br/>gemini-2.0-flash-lite<br/>gemini-2.0-flash"]
+
+    %% ===== FRONTEND COMPONENTS =====
+    subgraph FRONTEND ["FRONTEND — Web Application"]
+        ChatUI["💬 Chat Widget UI<br/>web/js/app.js<br/>Chat Input · Response Display<br/>Conversation ID Tracking"]
+        PredUI["📊 Prediction Panel<br/>IC50 Result Display"]
+        RecUI["📋 Recommendation Panel<br/>Drug Ranking Display"]
+    end
+
+    %% ===== BACKEND API COMPONENTS =====
+    subgraph API ["API GATEWAY — FastAPI"]
+        ChatRouter["🔀 Chatbot Router<br/>api/routers/chatbot.py<br/>POST /chat<br/>GET /chat/history<br/>DELETE /chat/history<br/>GET /chat/status"]
+        ChatSchemas["📋 Chat Schemas<br/>api/schemas/chatbot.py<br/>ChatRequest · ChatResponse<br/>ChatHistoryResponse<br/>ChatbotStatusResponse"]
+        PredRouter["🔀 Prediction Router<br/>api/routers/predict.py<br/>POST /predict/single"]
+        RecRouter["🔀 Recommendation Router<br/>api/routers/recommend.py<br/>POST /recommend"]
+    end
+
+    %% ===== SERVICE LAYER =====
+    subgraph SERVICES ["SERVICE LAYER"]
+        ChatService["🧠 Chatbot Service<br/>api/services/chatbot_service.py<br/>Singleton Pattern<br/>chat() · is_available()<br/>get_status() · get_conversation_history()"]
+        PromptLoader["📄 System Prompt Loader<br/>chatbot_module/prompts/<br/>system_prompt.txt<br/>chatbot_behavior.txt<br/>safety_rules.txt"]
+        ContextInjector["💉 Context Injector<br/>Prepends prediction/recommendation<br/>results into user message<br/>[Context: ic50: -1.46, ...]"]
+        FallbackEngine["🛡️ Fallback Response Engine<br/>chatbot_module/backend/chatbot_utils.py<br/>FALLBACK_RESPONSES Dict<br/>match_fallback_topic()"]
+        ModelFallback["🔄 Model Fallback Chain<br/>gemini-2.5-flash →<br/>gemini-2.0-flash-lite →<br/>gemini-2.0-flash"]
+    end
+
+    %% ===== MEMORY LAYER =====
+    subgraph MEMORY ["MEMORY LAYER"]
+        ConvMemory["💾 Conversation Memory<br/>chatbot_module/backend/chatbot_memory.py<br/>In-Memory Dict<br/>50 msg/conversation cap<br/>add_message() · build_gemini_history()"]
+    end
+
+    %% ===== AI INTEGRATION =====
+    subgraph AI ["AI INTEGRATION"]
+        GeminiSDK["🔮 Gemini SDK<br/>google-generativeai<br/>genai.configure(api_key)<br/>GenerativeModel<br/>start_chat() · send_message()"]
+    end
+
+    %% ===== CONFIGURATION =====
+    subgraph CONFIG ["CONFIGURATION"]
+        EnvFile["⚙️ .env File<br/>GEMINI_API_KEY<br/>GEMINI_MODEL"]
+    end
+
+    %% ===== DATA FLOW — PRIMARY PATH =====
+    User -->|"Ask Question<br/>+ Optional Context"| ChatUI
+    ChatUI -->|"HTTP POST /chat<br/>ChatRequest JSON"| ChatRouter
+    ChatRouter -->|"Validate Request"| ChatSchemas
+    ChatSchemas -->|"Validated ChatRequest"| ChatRouter
+    ChatRouter -->|"chat(message, conv_id, context)"| ChatService
+
+    %% — Context Injection
+    ChatService -->|"If context provided"| ContextInjector
+    ContextInjector -->|"Enhanced Message<br/>[Context: ...]<br/>User question: ..."| ChatService
+
+    %% — System Prompt Loading
+    ChatService -->|"Load domain prompt"| PromptLoader
+    PromptLoader -->|"System Prompt String"| ChatService
+
+    %% — Gemini Path
+    ChatService -->|"is_available() = True"| GeminiSDK
+    GeminiSDK -->|"HTTPS API Call<br/>generativeai.googleapis.com"| GeminiCloud
+    GeminiCloud -->|"AI Response Text"| GeminiSDK
+    GeminiSDK -->|"Response Text"| ChatService
+
+    %% — Model Fallback
+    ChatService -->|"429 Quota Error"| ModelFallback
+    ModelFallback -->|"Try Next Model"| GeminiSDK
+
+    %% — Memory Path
+    ChatService -->|"add_message(conv_id, role, content)"| ConvMemory
+    ConvMemory -->|"build_gemini_history(conv_id)<br/>[{role, parts}]"| ChatService
+
+    %% ===== DATA FLOW — FALLBACK PATH =====
+    ChatService -->|"is_available() = False<br/>OR all models fail"| FallbackEngine
+    FallbackEngine -->|"Match Topic + Return<br/>Pre-defined Response<br/>+ ⚠️ Disclaimer"| ChatService
+
+    %% ===== DATA FLOW — CONTEXT FROM ML =====
+    PredUI -->|"Prediction Result<br/>IC50 value, model, cell line"| ChatUI
+    RecUI -->|"Recommendation Result<br/>Drug ranking, scores"| ChatUI
+    PredRouter -->|"Prediction Response"| PredUI
+    RecRouter -->|"Recommendation Response"| RecUI
+
+    %% ===== DATA FLOW — CONFIG =====
+    EnvFile -->|"GEMINI_API_KEY<br/>GEMINI_MODEL"| GeminiSDK
+    EnvFile -->|"GEMINI_API_KEY"| ChatService
+
+    %% ===== DATA FLOW — RESPONSE =====
+    ChatService -->|"ChatResponse Dict"| ChatRouter
+    ChatRouter -->|"HTTP 200 JSON<br/>ChatResponse"| ChatUI
+    ChatUI -->|"Display AI Response"| User
+
+    %% ===== STYLING =====
+    classDef external fill:#FFE0B2,stroke:#E65100,stroke-width:2px,color:#000
+    classDef frontend fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000
+    classDef api fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000
+    classDef service fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px,color:#000
+    classDef memory fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000
+    classDef ai fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#000
+    classDef config fill:#F5F5F5,stroke:#616161,stroke-width:2px,color:#000
+    classDef fallback fill:#FFF9C4,stroke:#F57F17,stroke-width:2px,color:#000
+
+    class User,GeminiCloud external
+    class ChatUI,PredUI,RecUI frontend
+    class ChatRouter,ChatSchemas,PredRouter,RecRouter api
+    class ChatService,PromptLoader,ContextInjector service
+    class FallbackEngine,ModelFallback fallback
+    class ConvMemory memory
+    class GeminiSDK ai
+    class EnvFile config

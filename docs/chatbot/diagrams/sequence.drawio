@@ -1,0 +1,184 @@
+<mxfile host="app.diagrams.net" modified="2026-05-30" agent="5.0" version="24.0" type="device">
+  <diagram id="seq-diagram" name="Sequence Diagram">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- TITLE -->
+        <mxCell id="title" value="<b>Chatbot Request-Response Sequence Diagram</b><br>Drug Response Prediction Platform" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;fontColor=#333;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="400" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- LIFELINES -->
+        <mxCell id="User_head" value="<b>User</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="UI_head" value="<b>Chat Widget<br>UI</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="200" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Router_head" value="<b>Chatbot<br>Router</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#FFE0B2;strokeColor=#E65100;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="340" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Schemas_head" value="<b>Pydantic<br>Schemas</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#FFE0B2;strokeColor=#E65100;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="480" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Service_head" value="<b>Chatbot<br>Service</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="620" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Memory_head" value="<b>Conversation<br>Memory</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#B2DFDB;strokeColor=#00695C;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="760" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Prompt_head" value="<b>System<br>Prompt</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#E1BEE7;strokeColor=#6A1B9A;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="900" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Gemini_head" value="<b>Gemini<br>API</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#C5CAE9;strokeColor=#283593;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Fallback_head" value="<b>Fallback<br>Engine</b>" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=0;collapsible=0;recursive=0;outlineConnect=0;portConstraint=left;newEdgeStyle={"edgeStyle":"elbowEdgeStyle","curved":0,"rounded":0};fillColor=#FFCDD2;strokeColor=#C62828;fontSize=12;fontColor=#333;size=40;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="80" width="100" height="1200" as="geometry"/>
+        </mxCell>
+
+        <!-- ACTIVATION BOXES -->
+        <mxCell id="act_User" value="" style="shape=umlActivation;fillColor=#C8E6C9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="95" y="140" width="20" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_UI" value="" style="shape=umlActivation;fillColor=#C8E6C9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="235" y="160" width="20" height="900" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Router" value="" style="shape=umlActivation;fillColor=#FFE0B2;strokeColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="375" y="200" width="20" height="800" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Schemas" value="" style="shape=umlActivation;fillColor=#FFE0B2;strokeColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="515" y="240" width="20" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Service" value="" style="shape=umlActivation;fillColor=#E1BEE7;strokeColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="655" y="300" width="20" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Memory" value="" style="shape=umlActivation;fillColor=#B2DFDB;strokeColor=#00695C;" vertex="1" parent="1">
+          <mxGeometry x="795" y="500" width="20" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Memory2" value="" style="shape=umlActivation;fillColor=#B2DFDB;strokeColor=#00695C;" vertex="1" parent="1">
+          <mxGeometry x="795" y="700" width="20" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Prompt" value="" style="shape=umlActivation;fillColor=#E1BEE7;strokeColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="935" y="380" width="20" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Gemini" value="" style="shape=umlActivation;fillColor=#C5CAE9;strokeColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="560" width="20" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="act_Fallback" value="" style="shape=umlActivation;fillColor=#FFCDD2;strokeColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="1215" y="560" width="20" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- MESSAGES — REQUEST FLOW -->
+        <mxCell id="M1" value="1: Type question + optional context" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#2E7D32;strokeColor=#2E7D32;" edge="1" parent="1" source="act_User" target="act_UI">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M2" value="2: HTTP POST /chat (ChatRequest JSON)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#2E7D32;strokeColor=#2E7D32;" edge="1" parent="1" source="act_UI" target="act_Router">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M3" value="3: Validate request schema" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#E65100;strokeColor=#E65100;" edge="1" parent="1" source="act_Router" target="act_Schemas">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M3r" value="4: Validated ChatRequest" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#E65100;strokeColor=#E65100;" edge="1" parent="1" source="act_Schemas" target="act_Router">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M4" value="5: chat(message, conversation_id, context)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#6A1B9A;strokeColor=#6A1B9A;" edge="1" parent="1" source="act_Router" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- CONTEXT INJECTION -->
+        <mxCell id="M5" value="6: Inject context into message" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#6A1B9A;strokeColor=#6A1B9A;dashed=1;" edge="1" parent="1" source="act_Service" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- SYSTEM PROMPT -->
+        <mxCell id="M6" value="7: Load domain prompt" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#6A1B9A;strokeColor=#6A1B9A;" edge="1" parent="1" source="act_Service" target="act_Prompt">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M6r" value="8: System prompt string" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#6A1B9A;strokeColor=#6A1B9A;" edge="1" parent="1" source="act_Prompt" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- ALT BLOCK — GEMINI AVAILABLE -->
+        <mxCell id="alt_block" value="" style="shape=mxgraph.flowchart.annotation_2;rounded=1;fillColor=#E8EAF6;strokeColor=#283593;opacity=30;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="640" y="460" width="500" height="300" as="geometry"/>
+        </mxCell>
+        <mxCell id="alt_label" value="<b>alt</b> [Gemini API Available]" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="640" y="460" width="200" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- GEMINI PATH -->
+        <mxCell id="M7" value="9: build_gemini_history(conv_id)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#00695C;strokeColor=#00695C;" edge="1" parent="1" source="act_Service" target="act_Memory">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M7r" value="10: Gemini-formatted history [{role, parts}]" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#00695C;strokeColor=#00695C;" edge="1" parent="1" source="act_Memory" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M8" value="11: Configure API + Create GenerativeModel<br>start_chat(history) + send_message(enhanced_msg)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#283593;strokeColor=#283593;" edge="1" parent="1" source="act_Service" target="act_Gemini">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M8r" value="12: AI Response Text" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#283593;strokeColor=#283593;" edge="1" parent="1" source="act_Gemini" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- STORE IN MEMORY -->
+        <mxCell id="M9" value="13: add_message(conv_id, user, message)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#00695C;strokeColor=#00695C;" edge="1" parent="1" source="act_Service" target="act_Memory2">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M10" value="14: add_message(conv_id, assistant, response)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#00695C;strokeColor=#00695C;" edge="1" parent="1" source="act_Service" target="act_Memory2">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- ELSE BLOCK — FALLBACK -->
+        <mxCell id="else_label" value="<b>else</b> [Gemini API Unavailable]" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="640" y="780" width="200" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="else_block" value="" style="shape=mxgraph.flowchart.annotation_2;rounded=1;fillColor=#FFEBEE;strokeColor=#C62828;opacity=30;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="640" y="780" width="500" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="M11" value="15: match_fallback_topic(message)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#C62828;strokeColor=#C62828;dashed=1;" edge="1" parent="1" source="act_Service" target="act_Fallback">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M11r" value="16: Pre-defined response + disclaimer" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#C62828;strokeColor=#C62828;" edge="1" parent="1" source="act_Fallback" target="act_Service">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <!-- RESPONSE FLOW -->
+        <mxCell id="M12" value="17: ChatResponse Dict" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#6A1B9A;strokeColor=#6A1B9A;" edge="1" parent="1" source="act_Service" target="act_Router">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M13" value="18: HTTP 200 ChatResponse JSON" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#E65100;strokeColor=#E65100;" edge="1" parent="1" source="act_Router" target="act_UI">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="M14" value="19: Display AI Response" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;edgeStyle=elbowEdgeStyle;curved=0;rounded=0;fontSize=10;fontColor=#2E7D32;strokeColor=#2E7D32;" edge="1" parent="1" source="act_UI" target="act_User">
+          <mxGeometry x="-0.2" y="-10" relative="1" as="geometry"><mxPoint as="offset"/></mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

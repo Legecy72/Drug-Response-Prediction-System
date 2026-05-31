@@ -1,0 +1,53 @@
+%% Chatbot Subsystem — Deployment Diagram
+%% Drug Response Prediction & Recommendation Platform
+%% Graduation Project in Bioinformatics
+
+graph TB
+    %% ===== CLIENT ENVIRONMENT =====
+    subgraph CLIENT ["CLIENT ENVIRONMENT — User Browser"]
+        Browser["🌐 Browser<br/>Chrome / Firefox / Edge<br/>HTTP Client"]
+        WebApp["📱 Frontend Web Application<br/>Web/index.html<br/>web/css/style.css<br/>web/js/app.js<br/>Static Files Served by FastAPI<br/>/static Mount"]
+        ChatWidget["💬 Chat Widget UI<br/>Embedded in Web Application<br/>Sends POST /chat Requests<br/>Displays AI Responses<br/>Tracks Conversation_id"]
+    end
+
+    %% ===== SERVER ENVIRONMENT =====
+    subgraph SERVER ["SERVER ENVIRONMENT — FastAPI Server"]
+        FastAPIServer["⚡ FastAPI Server<br/>UVicorn on Port 8000<br/>api/main.py<br/>CORS Middleware<br/>Request Timing Middleware<br/>Lifespan Manager"]
+        ChatRouter["🔀 Chatbot Router<br/>api/routers/chatbot.py<br/>POST /chat<br/>GET /chat/history/{id}<br/>DELETE /chat/history/{id}<br/>GET /chat/status"]
+        ChatService["🧠 Chatbot Service<br/>api/services/chatbot_service.py<br/>Singleton Instance<br/>Get_chatbot_service()"]
+        ConvStore["💾 Conversation Store<br/>In-Memory Dictionary<br/>chatbot_module/backend/chatbot_memory.py<br/>ConversationMemory Class<br/>50 Msg/conversation Cap<br/>Auto-Trim Older Messages"]
+        PromptFiles["📝 Prompt Files<br/>chatbot_module/prompts/<br/>system_prompt.txt<br/>chatbot_behavior.txt<br/>safety_rules.txt<br/>Loaded at Service Init"]
+        EnvFile["⚙️ .env Configuration<br/>GEMINI_API_KEY<br/>GEMINI_MODEL<br/>Loaded via python-dotenv"]
+        MLModels["🧮 ML Models<br/>model/*.pkl files<br/>CatBoost · XGBoost · LightGBM<br/>GradientBoosting · Ridge<br/>ElasticNet · Lasso"]
+        Preprocessor["🔧 Preprocessor Artifacts<br/>core/saved_preprocessor/*.pkl<br/>LabelEncoders · StandardScaler<br/>Metadata · Never Fit at Runtime"]
+    end
+
+    %% ===== EXTERNAL SERVICES =====
+    subgraph EXTERNAL ["EXTERNAL SERVICES — Google Cloud"]
+        GeminiCloud["🔮 Gemini API Cloud<br/>generativeai.googleapis.com<br/>Google Generative AI Service<br/>gemini-2.5-flash (Primary)<br/>gemini-2.0-flash-lite (Fallback 1)<br/>gemini-2.0-flash (Fallback 2)<br/>Rate Limits · Quota Management<br/>Safety Filters · Content Policies"]
+    end
+
+    %% ===== DEPLOYMENT CONNECTIONS =====
+    Browser -->|"HTTP Requests<br/>localhost:8000"| WebApp
+    WebApp -->|"REST API Calls<br/>POST /chat<br/>GET /chat/status<br/>GET /chat/history"| FastAPIServer
+    FastAPIServer -->|"Route Requests<br/>/chat prefix"| ChatRouter
+    ChatRouter -->|"Delegate to Service<br/>chat() · Get_status()<br/>Get_conversation_history()<br/>Clear_conversation()"| ChatService
+    ChatService -->|"Read Prompt Config"| PromptFiles
+    ChatService -->|"Read API Key + Model"| EnvFile
+    ChatService -->|"Store/Retrieve History<br/>add_message() · build_gemini_history()<br/>get_formatted_history() · clear_conversation()"| ConvStore
+    ChatService -->|"HTTPS API Calls<br/>google-generativeai SDK<br/>genai.configure(api_key)<br/>GenerativeModel · Start_chat<br/>Send_message()"| GeminiCloud
+    ChatService -->|"Load Models<br/>for Prediction Context"| MLModels
+    ChatService -->|"Load Preprocessor<br/>for Prediction Context"| Preprocessor
+
+    %% ===== STYLING =====
+    classDef client fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000
+    classDef server fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000
+    classDef external fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#000
+    classDef store fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000
+    classDef config fill:#F5F5F5,stroke:#616161,stroke-width:2px,color:#000
+
+    class Browser,WebApp,ChatWidget client
+    class FastAPIServer,ChatRouter,ChatService server
+    class GeminiCloud external
+    class ConvStore,PromptFiles,MLModels,Preprocessor store
+    class EnvFile config

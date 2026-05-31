@@ -1,0 +1,44 @@
+graph TB
+    subgraph CLIENT["CLIENT ENVIRONMENT - User Browser"]
+        Browser["Browser\nChrome / Firefox / Edge\nHTTP Client"]
+        WebApp["Frontend Web Application\nweb/index.html\nweb/css/style.css\nweb/js/app.js\nStatic Files Served by FastAPI\n/static Mount"]
+        ChatWidget["Chat Widget UI\nEmbedded in Web Application\nSends POST /chat Requests\nDisplays AI Responses\nTracks Conversation_id"]
+    end
+
+    subgraph SERVER["SERVER ENVIRONMENT - FastAPI Server"]
+        FastAPIServer["FastAPI Server\nUVicorn on Port 8000\napi/main.py\nCORS Middleware\nRequest Timing Middleware\nLifespan Manager"]
+        ChatRouter["Chatbot Router\napi/routers/chatbot.py\nPOST /chat\nGET /chat/history/id\nDELETE /chat/history/id\nGET /chat/status"]
+        ChatService["Chatbot Service\napi/services/chatbot_service.py\nSingleton Instance\nget_chatbot_service"]
+        ConvStore["Conversation Store\nIn-Memory Dictionary\nchatbot_module/backend/chatbot_memory.py\nConversationMemory Class\n50 Msg/conversation Cap\nAuto-Trim Older Messages"]
+        PromptFiles["Prompt Files\nchatbot_module/prompts/\nsystem_prompt.txt\nchatbot_behavior.txt\nsafety_rules.txt\nLoaded at Service Init"]
+        EnvFile[".env Configuration\nGEMINI_API_KEY\nGEMINI_MODEL\nLoaded via python-dotenv"]
+        MLModels["ML Models\nmodel/*.pkl files\nCatBoost - XGBoost - LightGBM\nGradientBoosting - Ridge\nElasticNet - Lasso"]
+        Preprocessor["Preprocessor Artifacts\ncore/saved_preprocessor/*.pkl\nLabelEncoders - StandardScaler\nMetadata - Never Fit at Runtime"]
+    end
+
+    subgraph EXTERNAL["EXTERNAL SERVICES - Google Cloud"]
+        GeminiCloud["Gemini API Cloud\ngenerativeai.googleapis.com\nGoogle Generative AI Service\ngemini-2.5-flash Primary\ngemini-2.0-flash-lite Fallback 1\ngemini-2.0-flash Fallback 2\nRate Limits - Quota Management\nSafety Filters - Content Policies"]
+    end
+
+    Browser -->|"HTTP Requests\nlocalhost:8000"| WebApp
+    WebApp -->|"REST API Calls\nPOST /chat\nGET /chat/status\nGET /chat/history"| FastAPIServer
+    FastAPIServer -->|"Route Requests\n/chat prefix"| ChatRouter
+    ChatRouter -->|"Delegate to Service\nchat - get_status\nget_conversation_history\nclear_conversation"| ChatService
+    ChatService -->|"Read Prompt Config"| PromptFiles
+    ChatService -->|"Read API Key + Model"| EnvFile
+    ChatService -->|"Store/Retrieve History\nadd_message - build_gemini_history\nget_formatted_history - clear_conversation"| ConvStore
+    ChatService -->|"HTTPS API Calls\ngoogle-generativeai SDK\ngenai.configure api_key\nGenerativeModel - start_chat\nsend_message"| GeminiCloud
+    ChatService -->|"Load Models\nfor Prediction Context"| MLModels
+    ChatService -->|"Load Preprocessor\nfor Prediction Context"| Preprocessor
+
+    classDef client fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000
+    classDef server fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000
+    classDef external fill:#FFEBEE,stroke:#C62828,stroke-width:2px,color:#000
+    classDef store fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000
+    classDef config fill:#F5F5F5,stroke:#616161,stroke-width:2px,color:#000
+
+    class Browser,WebApp,ChatWidget client
+    class FastAPIServer,ChatRouter,ChatService server
+    class GeminiCloud external
+    class ConvStore,PromptFiles,MLModels,Preprocessor store
+    class EnvFile config

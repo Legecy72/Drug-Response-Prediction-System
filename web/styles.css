@@ -1,0 +1,587 @@
+:root {
+  --bg: #081116;
+  --ink: #e9f4f7;
+  --muted: #8fa6af;
+  --line: rgba(155, 199, 210, 0.18);
+  --panel: rgba(12, 27, 35, 0.86);
+  --accent: #25b7c7;
+  --accent-2: #5e7ce2;
+  --good: #68d6ae;
+  --bad: #d86969;
+  --shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(135deg, rgba(37, 183, 199, 0.1), transparent 34rem),
+    radial-gradient(circle at top right, rgba(94, 124, 226, 0.16), transparent 30rem),
+    radial-gradient(circle at bottom left, rgba(22, 131, 93, 0.1), transparent 28rem),
+    var(--bg);
+}
+
+.shell {
+  width: min(1480px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 22px 0 28px;
+}
+
+.topbar {
+  min-height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(9, 20, 27, 0.98), rgba(9, 20, 27, 0.78)),
+    url("/static/bio-pattern.svg") right center / auto 100% no-repeat;
+  margin-bottom: 16px;
+}
+
+.eyebrow,
+.panel-kicker {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.panel-kicker {
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(1.55rem, 3vw, 2.45rem);
+  line-height: 1.05;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+.status,
+.panel,
+.metric {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.status {
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 460px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(320px, 390px) 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.panel,
+.metric {
+  border-radius: 8px;
+}
+
+.controls {
+  position: sticky;
+  top: 16px;
+  padding: 16px;
+}
+
+.panel-head {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-head span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 11px;
+}
+
+label span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+select,
+input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(5, 13, 18, 0.72);
+  color: var(--ink);
+  font-size: 0.92rem;
+  padding: 0 10px;
+}
+
+option {
+  color: #172026;
+}
+
+select:focus,
+input:focus {
+  outline: 2px solid rgba(37, 183, 199, 0.24);
+  border-color: var(--accent);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.primary {
+  color: #031014;
+  background: var(--accent);
+}
+
+.secondary {
+  color: #fff;
+  background: var(--accent-2);
+}
+
+.icon-button {
+  width: 34px;
+  min-height: 34px;
+  color: #d7f7fb;
+  background: rgba(94, 124, 226, 0.16);
+}
+
+.note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.results {
+  display: grid;
+  gap: 16px;
+}
+
+.anatomy-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(260px, 1fr);
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.anatomy-panel .panel-head {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.anatomy-stage {
+  position: relative;
+  min-height: 430px;
+  border: 1px solid rgba(155, 199, 210, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(37, 183, 199, 0.08), transparent),
+    radial-gradient(circle at center, rgba(37, 183, 199, 0.18), rgba(2, 8, 12, 0.12) 58%, rgba(2, 8, 12, 0.5));
+}
+
+.anatomy-stage::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(191, 234, 240, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.body-visual {
+  width: 100%;
+  height: 100%;
+  min-height: 430px;
+  display: block;
+}
+
+.body-camera {
+  transform-origin: 180px 285px;
+  transition: transform 680ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.aura {
+  fill: url("#bodyGlow");
+  opacity: 0.6;
+}
+
+.body-shell {
+  fill: rgba(150, 217, 226, 0.08);
+  stroke: url("#bodyLine");
+  stroke-width: 2.2;
+}
+
+.spine-line {
+  fill: none;
+  stroke: rgba(191, 234, 240, 0.22);
+  stroke-dasharray: 5 8;
+  stroke-width: 1.4;
+}
+
+.organ {
+  fill: rgba(93, 151, 166, 0.18);
+  stroke: rgba(191, 234, 240, 0.42);
+  stroke-width: 1.4;
+  opacity: 0.42;
+  transform-origin: center;
+  transition:
+    fill 420ms ease,
+    opacity 420ms ease,
+    stroke 420ms ease,
+    transform 420ms ease;
+}
+
+.skin {
+  fill: transparent;
+  opacity: 0;
+}
+
+.ring {
+  fill: none;
+  stroke: rgba(37, 183, 199, 0);
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: center;
+  transition: opacity 420ms ease, stroke 420ms ease;
+}
+
+.anatomy-stage[data-organ="brain"] .body-camera {
+  transform: translateY(32px) scale(1.1);
+}
+
+.anatomy-stage[data-organ="lungs"] .body-camera,
+.anatomy-stage[data-organ="breast"] .body-camera {
+  transform: translateY(-10px) scale(1.06);
+}
+
+.anatomy-stage[data-organ="liver"] .body-camera {
+  transform: translate(-22px, -42px) scale(1.1);
+}
+
+.anatomy-stage[data-organ="colon"] .body-camera {
+  transform: translateY(-64px) scale(1.12);
+}
+
+.anatomy-stage[data-organ="skin"] .body-camera {
+  transform: scale(1.02);
+}
+
+.anatomy-stage[data-organ]:not([data-organ="default"]) .body-shell {
+  opacity: 0.55;
+}
+
+.anatomy-stage[data-organ="brain"] .brain,
+.anatomy-stage[data-organ="lungs"] .lungs,
+.anatomy-stage[data-organ="breast"] .breast,
+.anatomy-stage[data-organ="liver"] .liver,
+.anatomy-stage[data-organ="colon"] .colon,
+.anatomy-stage[data-organ="skin"] .skin {
+  fill: rgba(37, 183, 199, 0.48);
+  stroke: rgba(205, 249, 255, 0.96);
+  opacity: 1;
+  filter: url("#organGlow");
+  animation: organPulse 2.4s ease-in-out infinite;
+}
+
+.anatomy-stage[data-organ="skin"] .skin {
+  fill: rgba(37, 183, 199, 0.12);
+}
+
+.anatomy-stage[data-organ="brain"] .brain-ring,
+.anatomy-stage[data-organ="lungs"] .chest-ring,
+.anatomy-stage[data-organ="breast"] .chest-ring,
+.anatomy-stage[data-organ="liver"] .liver-ring,
+.anatomy-stage[data-organ="colon"] .colon-ring,
+.anatomy-stage[data-organ="skin"] .chest-ring {
+  opacity: 1;
+  stroke: rgba(37, 183, 199, 0.45);
+}
+
+.organ-card {
+  min-height: 240px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(155, 199, 210, 0.14);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(37, 183, 199, 0.1), rgba(94, 124, 226, 0.08)),
+    rgba(5, 13, 18, 0.44);
+}
+
+.organ-card span {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.organ-card strong {
+  display: block;
+  font-size: 1.32rem;
+  line-height: 1.2;
+}
+
+.organ-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.organ-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.organ-tags span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(155, 199, 210, 0.16);
+  border-radius: 999px;
+  padding: 0 10px;
+  color: #bfeaf0;
+  background: rgba(191, 234, 240, 0.06);
+  text-transform: none;
+}
+
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  min-height: 98px;
+  padding: 14px;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 10px;
+  font-size: clamp(1.1rem, 2vw, 1.65rem);
+  overflow-wrap: anywhere;
+}
+
+.table-panel,
+.chat-panel {
+  padding: 16px;
+}
+
+.table-wrap {
+  overflow: auto;
+  max-height: 560px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(6, 15, 20, 0.78);
+  font-size: 0.88rem;
+}
+
+th,
+td {
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #11252f;
+  color: #b8d6de;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.empty {
+  height: 120px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 9px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.pill.good {
+  color: var(--good);
+  background: rgba(22, 131, 93, 0.18);
+}
+
+.pill.bad {
+  color: var(--bad);
+  background: rgba(161, 61, 61, 0.16);
+}
+
+.chat-log {
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  max-height: 210px;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(5, 13, 18, 0.54);
+}
+
+.message {
+  max-width: 88%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.message.user {
+  justify-self: end;
+  color: #031014;
+  background: var(--accent);
+}
+
+.message.assistant {
+  justify-self: start;
+  background: rgba(143, 166, 175, 0.16);
+}
+
+.chat-box {
+  display: grid;
+  grid-template-columns: 1fr 96px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@keyframes organPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    position: static;
+  }
+
+  .metric-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .anatomy-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .anatomy-stage,
+  .body-visual {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 620px) {
+  .shell {
+    width: min(100% - 20px, 1480px);
+    padding-top: 12px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .status {
+    width: 100%;
+  }
+
+  .metric-row,
+  .actions,
+  .chat-box {
+    grid-template-columns: 1fr;
+  }
+}

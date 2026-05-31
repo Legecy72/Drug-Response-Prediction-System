@@ -1,0 +1,193 @@
+{
+  "sample_requests": [
+    {
+      "description": "Basic message — new conversation, no context",
+      "request": {
+        "message": "What does IC50 mean?"
+      },
+      "expected_response": {
+        "success": true,
+        "message": "IC50 (Half Maximal Inhibitory Concentration) measures...",
+        "conversation_id": "auto-generated-UUID",
+        "model_used": "gemini-2.5-flash or fallback"
+      }
+    },
+    {
+      "description": "Message with prediction context",
+      "request": {
+        "message": "What does this prediction mean?",
+        "conversation_id": "conv_abc123",
+        "context": {
+          "predicted_ic50": -1.46,
+          "model_used": "CatBoost",
+          "cell_line_name": "A172",
+          "drug_name": "Camptothecin"
+        }
+      },
+      "expected_response": {
+        "success": true,
+        "message": "An IC50 value of -1.46 indicates...",
+        "conversation_id": "conv_abc123",
+        "model_used": "gemini-2.5-flash or fallback"
+      }
+    },
+    {
+      "description": "Continue conversation — follow-up question",
+      "request": {
+        "message": "Can you explain more about the preprocessing pipeline?",
+        "conversation_id": "conv_abc123"
+      },
+      "expected_response": {
+        "success": true,
+        "message": "The preprocessing pipeline has 3 stages...",
+        "conversation_id": "conv_abc123",
+        "model_used": "gemini-2.5-flash or fallback"
+      }
+    },
+    {
+      "description": "Message with recommendation context",
+      "request": {
+        "message": "Why is Camptothecin ranked as the top drug?",
+        "context": {
+          "cell_line_name": "A172",
+          "top_drug": "Camptothecin",
+          "top_drug_ic50": -1.46,
+          "top_drug_score": 0.87,
+          "total_drugs_evaluated": 265
+        }
+      },
+      "expected_response": {
+        "success": true,
+        "message": "Camptothecin is ranked #1 because...",
+        "conversation_id": "auto-generated-UUID",
+        "model_used": "gemini-2.5-flash or fallback"
+      }
+    },
+    {
+      "description": "Empty message (validation error)",
+      "request": {
+        "message": "   "
+      },
+      "expected_response": {
+        "status_code": 422,
+        "body": {
+          "success": false,
+          "error": "Validation error",
+          "detail": [
+            {
+              "loc": ["body", "message"],
+              "msg": "Message cannot be empty or contain only whitespace"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "description": "Message too long (validation error)",
+      "request": {
+        "message": "This is a very long message that exceeds 2000 characters..."
+      },
+      "expected_response": {
+        "status_code": 422,
+        "body": {
+          "success": false,
+          "error": "Validation error",
+          "detail": [
+            {
+              "loc": ["body", "message"],
+              "msg": "String should have at most 2000 characters"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sample_responses_history": [
+    {
+      "description": "Get conversation history",
+      "conversation_id": "conv_abc123",
+      "expected_response": {
+        "success": true,
+        "conversation_id": "conv_abc123",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What does IC50 mean?",
+            "timestamp": "2026-05-25T11:55:00"
+          },
+          {
+            "role": "assistant",
+            "content": "IC50 (Half Maximal Inhibitory Concentration) measures...",
+            "timestamp": "2026-05-25T11:55:05"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Get empty history (unknown conversation_id)",
+      "conversation_id": "unknown-id-12345",
+      "expected_response": {
+        "success": true,
+        "conversation_id": "unknown-id-12345",
+        "messages": []
+      }
+    }
+  ],
+  "sample_responses_status": [
+    {
+      "description": "Check chatbot status (available)",
+      "expected_response": {
+        "available": true,
+        "model": "gemini-2.5-flash",
+        "api_key_configured": true,
+        "message": "Chatbot service is available with Gemini AI"
+      }
+    },
+    {
+      "description": "Check chatbot status (fallback mode)",
+      "expected_response": {
+        "available": false,
+        "model": null,
+        "api_key_configured": false,
+        "message": "Chatbot service is in fallback mode (GEMINI_API_KEY not configured)"
+      }
+    }
+  ],
+  "sample_responses_clear": [
+    {
+      "description": "Clear conversation history",
+      "conversation_id": "conv_abc123",
+      "expected_response": {
+        "success": true,
+        "message": "Conversation conv_abc123 cleared"
+      }
+    }
+  ],
+  "sample_requests_fallback_topics": [
+    {
+      "description": "IC50 topic keywords",
+      "keywords": ["ic50", "IC 50", "half maximal", "inhibitory concentration", "sensitivity", "ln_ic50"],
+      "expected_topic": "ic50"
+    },
+    {
+      "description": "Recommendation topic keywords",
+      "keywords": ["recommend", "ranking", "score", "drug order", "best drug", "top drug"],
+      "expected_topic": "recommendation"
+    },
+    {
+      "description": "Preprocessing topic keywords",
+      "keywords": ["preprocess", "encoding", "label encod", "scaling", "feature selection", "pipeline"],
+      "expected_topic": "preprocessing"
+    },
+    {
+      "description": "Model topic keywords",
+      "keywords": ["model", "catboost", "xgboost", "lightgbm", "gradient", "ridge", "lasso", "elasticnet"],
+      "expected_topic": "models"
+    },
+    {
+      "description": "General topic keywords",
+      "keywords": ["hello", "help", "what can you do", "tell me about"],
+      "expected_topic": "general"
+    }
+  ]
+}
