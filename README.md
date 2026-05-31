@@ -1,59 +1,164 @@
-# Drug Response Web App
+# Drug Response Prediction System
 
-Organized FastAPI project for GDSC drug response prediction and recommendation.
+## Overview
 
-## Structure
+Drug Response Prediction System is a Bioinformatics graduation project that predicts cancer cell line sensitivity to anti-cancer drugs using Machine Learning models.
+
+The system integrates:
+
+- Drug Response Prediction
+- Drug Recommendation Engine
+- Interactive AI Chatbot Assistant
+- FastAPI Backend
+- Modern Web Interface
+
+---
+
+## Features
+
+### Prediction Module
+
+Predicts LN_IC50 values using trained regression models:
+
+- CatBoost
+- XGBoost
+- LightGBM
+- Gradient Boosting
+- ElasticNet
+- Ridge
+- Lasso
+
+---
+
+### Recommendation Engine
+
+Ranks candidate drugs based on:
+
+- Predicted LN_IC50
+- Predicted IC50
+- IC50 Score
+- Cancer context matching
+
+---
+
+### AI Chatbot Assistant
+
+Provides:
+
+- IC50 interpretation
+- Drug sensitivity explanations
+- Recommendation explanations
+- Model information
+- Bioinformatics guidance
+
+Powered by:
+
+- Google Gemini API
+- Fallback Response Engine
+
+---
+
+## Technology Stack
+
+### Backend
+
+- Python
+- FastAPI
+- Pydantic
+- Scikit-Learn
+- CatBoost
+- XGBoost
+- LightGBM
+
+### Frontend
+
+- HTML
+- CSS
+- JavaScript
+
+### AI
+
+- Google Gemini API
+
+---
+
+## Project Structure
 
 ```text
 project/
-  api/                         FastAPI app, routers, chatbot endpoints
-  core/                        Settings, schemas, prediction services, ML engines
-  data/                        Prompt/data files used by support modules
-  models/                      Saved regression/classification artifacts
-  web/                         Static frontend files
-  scripts/                     Run helpers
-  docs/                        Chatbot and project documentation
-  screenshots/                 UI screenshots for project reporting
-  tests/                       Chatbot/API tests
-  .env.example
-  requirements.txt
-  README.md
-  LICENSE
+│
+├── api/
+├── core/
+├── data/
+├── models/
+├── web/
+├── scripts/
+├── docs/
+├── tests/
+│
+├── start.py
+├── requirements.txt
+└── README.md
 ```
 
-## Run
+---
 
-```powershell
+## Running the Project
+
+### Create Environment
+
+```bash
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-copy .env.example .env
-.\scripts\run.ps1
 ```
 
-Open:
+### Activate Environment
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Start Application
+
+```bash
+python start.py
+```
+
+---
+
+## Application URLs
+
+Frontend:
 
 ```text
-http://127.0.0.1:8000
+http://localhost:8000/app
 ```
 
-If port `8000` is busy:
+API Docs:
 
-```powershell
-uvicorn api.main:app --reload --host 127.0.0.1 --port 8001
+```text
+http://localhost:8000/docs
 ```
 
-## Main Endpoints
+Health Check:
 
-- `GET /api/status`
-- `GET /api/options`
-- `GET /api/sample-input`
-- `POST /api/predict`
-- `POST /api/recommend`
-- `POST /api/chat`
+```text
+http://localhost:8000/health
+```
 
-## Notes
+---
 
-- The frontend is in `web/` and is served by FastAPI.
-- Saved ML artifacts are in `models/`.
-- `.env.example` is sanitized and does not include a real API key.
+## Authors
+
+Graduation Project in Bioinformatics
+
+Faculty of Computer and Artificial Intelligence
+
+2026
