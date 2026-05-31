@@ -159,6 +159,6 @@ http://localhost:8000/health
 
 Graduation Project in Bioinformatics
 
-Faculty of Computer and Artificial Intelligence
+Faculty of Artificial Intelligence Delta univ
 
 2026
